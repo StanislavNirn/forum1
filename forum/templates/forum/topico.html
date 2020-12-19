@@ -1,0 +1,80 @@
+{% load static %}
+{% load tags %}
+
+  {% include './head.html' %}
+    <title>{{ topico.titulo }}</title>
+    <script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
+    <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+  </head>
+  
+  <body>
+    {% include './navbar.html' %}
+    <div class = "wd-100 container"> 
+      <div id = "topico">
+        <div class="media" style="background-color:#212529;">
+
+          <div id = "profile">
+            <figure>
+              <img class="rounded align-self-start mr-3 img-thumbnail float-left" {% if not topico.autor.avatar %} src="{% static 'forum/img/profile.png' %}" {% else %} src="{{ topico.autor.avatar.url }}" {% endif %} alt="Profile Pic" width="128" height="256">
+              <figcaption>
+                <span id = "profile-fig-caption"> {{ topico.autor.first_name }} {{ topico.autor.last_name }} <br> {{ topico.autor.username }} <br> Сообщения: {{ topico.autor.posts }} <br> Ответы: {{ topico.autor.replies }}</span>
+              </figcaption> 
+            </figure>
+          </div>
+      
+          <div id = "resposta" class="media-body">
+            <span id = "resposta-data">{{ topico.data_postagem }}</span><br><br> 
+            <span id = "resposta-texto">{{ topico.texto|safe }}</span>
+          </div>
+        </div>
+      </div>
+    
+      {% for r in resposta_lista %}
+        <div id = "resposta">
+          <div class="media" style="background-color:#212529;">
+            <div id = "profile">
+              <figure>
+                <img class="rounded align-self-start mr-3 img-thumbnail float-left" {% if not r.autor.avatar %} src="{% static 'forum/img/profile.png' %}" {% else %} src="{{ r.autor.avatar.url }}" {% endif %} alt="Profile Pic" width="128" height="256">
+                <figcaption>
+                  <span id = "profile-fig-caption"> {{ r.autor.first_name }} {{ r.autor.last_name }} <br> {{ r.autor.username }} <br> Posts: {{ r.autor.posts }} <br> Respostas: {{ r.autor.replies }}</span>
+                </figcaption> 
+              </figure>
+            </div>
+          
+            <div id = "resposta" class="media-body">
+              <span id = "resposta-data">{{ r.data_postagem }}</span><br><br> 
+              <span id = "resposta-texto">{{ r.texto|safe }}</span>
+            </div>
+
+          </div>
+        </div>
+      {% endfor %}
+
+      {% if user.is_authenticated %}
+        <form  class="form-control" method="POST">
+          {% csrf_token %}
+          <div id = "escrever-resposta">
+            <input name="autor" type = "hidden" value="{{ request.user.id }}">
+            <input name="topico_fk" type="hidden" value="{{ topico.id }}">
+
+            <div class = "form-group">
+              <div id = "texto">{{ form.texto }}</div>
+
+              {% if request.method == 'POST' %}
+                {% if form.texto.errors %}
+                  <span id = "inv-texto" class = "c-msg"><b>{{ form.texto.errors }}</b></span>
+                {% endif %}
+              {% endif %}
+              
+            </div>
+
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Ответить</button>
+          </div>
+        </form>
+      {% else %}
+        <a href = "/?next={{request.path}}"><span style="color:red;">Вы должны войти в систему, чтобы ответить</span></a>
+      {% endif %} 
+    
+    </div>
+  </body>
+</html>

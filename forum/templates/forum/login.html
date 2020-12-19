@@ -1,0 +1,46 @@
+{% load static %}
+
+  {% include './head.html' %}
+    <title>Login no forum</title>
+    <script src="{% static 'forum/js/login.js' %}"></script>
+  </head>
+
+  <body>
+    <div class = "container-wd-100">
+      <div id = "bounds">
+        <img class = "logo" src="{% static 'forum/img/django-forum-logo.png' %}">
+
+        {% if next %}
+          <form id = "login-form" action="/?next={{next}}" class="form-control" method="POST">
+        {%else%}
+          <form id = "login-form" class="form-control" method="POST"> 
+        {% endif %}
+      
+        {% csrf_token %}
+        <div class = "form-group">
+          <label for="username">Имя пользователя: </label>
+          <input type="text" name="username" id="username" class="form-control" placeholder="Имя пользователя">
+          <div id = "inv-username" class="invalid-feedback"></div>
+        </div>
+
+        <div class = "form-group">
+          <label for="password">Пароль: </label>
+          <input name="password" type="password" id="password" class="form-control" placeholder="Пароль">
+          <div id = "inv-password" class="invalid-feedback"></div>
+        </div>
+
+        <a href = "{% url 'registrar' %}">Регистрация</a>
+
+        <button id = "login" class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
+        
+        {% if messages %}
+          {% for message in messages %}
+          <span class = "c-msg">{{ message }}</span>
+          {% endfor %}
+        {% endif %}
+        </form>
+    
+      </div>
+    </div>
+  </body>
+</html>

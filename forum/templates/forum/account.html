@@ -1,0 +1,123 @@
+{% load static %}
+{% load tags %}
+
+  {% include './head.html' %}
+    <title>{{ request.user.username }}</title>
+    <script type="text/javascript" src="{% static 'forum/js/account.js' %}"></script>
+  </head>
+
+    <body>
+        {% include './navbar.html' %}
+        <input id = "hidden-first_name" type = "hidden" value = "{{ request.user.first_name }}"> 
+        <input id = "hidden-last_name" type = "hidden" value = "{{ request.user.last_name }}"> 
+        <input id = "hidden-email" type = "hidden" value = "{{ request.user.email }}">
+
+        <div class="container">
+            <div class="row my-2">
+                <div class="col-lg-8 order-lg-2">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a href="#" data-target="#profile" data-toggle="tab" class="nav-link active">Профиль</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="" data-target="#edit" data-toggle="tab" class="nav-link">Редактировать профиль</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content py-4">
+                        <div class="tab-pane active"  id="profile">
+                            <div class=" col-md-9 col-lg-9 "> 
+                                <table class="table">  
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Логин пользователя</b></td>
+                                            <td colspan="2">{{ request.user.username }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Имя и фамилия</b></td>
+                                            <td colspan="2">{{ request.user.first_name }} {{ request.user.last_name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Email</b></td>
+                                            <td colspan="2">{{ request.user.email }}</td>   
+                                        </tr>
+                                        <tr>
+                                            <td><b>Последний вход</b></td>
+                                            <td colspan="2">{{ request.user.last_login }}</td>
+                                        </tr>   
+                                        <tr>
+                                            <td><b>Время входа</b></td>
+                                            <td colspan="2">{{ request.user.date_joined }}</td>   
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div id ="posts" class="col-md-12">
+                                <h6 class="mt-2">Тема: </h6>
+                                <table class="table table-striped table-sm table-hover">
+                                    <tbody>  
+                                        {% for p in user_topicos %}                                  
+                                            <tr>
+                                                <td>
+                                                    {{ p.titulo }}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="edit">
+                            <form enctype="multipart/form-data" class="form-control" method="POST"> 
+                                {% csrf_token %}
+                            
+                                <div class = "form-group">
+                                    <label for="avatar">Изменить аватарку:</label> 
+                                    <input type="file" name="avatar" accept="image/png, image/jpeg, image/gif" id="avatar" class = "form-control {% if request.method == 'POST' %}{% if form.avatar.errors %} is-invalid {% else %} label-margin {% endif %}{% endif %}">
+
+                                    {% if request.method == 'POST' %}
+                                        {% if form.avatar.errors %}
+                                            <div id = "inv-avatar" class="invalid-feedback">{% for error in form.avatar.errors %} <p>{{ error }}</p> {% endfor %} </div>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+
+                                <div class = "form-group">
+                                    <label for="first_name">Изменить имя:</label> 
+                                    <input type="text" name="first_name" class="form-control" maxlength="30" id="first_name">
+                                </div>
+
+                                <div class = "form-group">
+                                    <label for="last_name">Изменить фамилию:</label> 
+                                    <input type="text" name="last_name" class="form-control" maxlength="150" id="last_name">
+                                </div>
+
+                                <div class = "form-group">
+                                    <label for="email">Email:</label> 
+                                    <input type="email" name="email" class="form-control {% if request.method == 'POST' %}{% if form.email.errors %} is-invalid {% endif %}{% endif %}" maxlength="254" id="email">
+
+                                    {% if request.method == 'POST' %}
+                                        {% if form.email.errors %}
+                                            <div id = "inv-email" class="invalid-feedback">{{ form.email.errors }}</div>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+
+                                <button type="submit" class="btn btn-lg btn-primary btn-block" style="margin-top:3%">Сохранить</button>
+                                <a class="btn btn-secondary btn-lg btn-block" href="/account/trocar_senha" role="button">Изменить пароль</a> 
+                            </form>      
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 order-lg-1 text-center">
+                    <img {% if not request.user.avatar %} src="{% static 'forum/img/profile.png' %}" {% else %} src="{{ request.user.avatar.url }}"{% endif %} class="mx-auto img-fluid img-circle d-block" width="128" height="256" alt="avatar">
+                </div>
+
+            </div>
+        </div>
+    </body>
+</html>
